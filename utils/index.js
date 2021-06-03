@@ -1,4 +1,4 @@
-// const moment = require('moment');
+const moment = require('moment');
 const connect = require('../models/connection');
 
 let onlineUsers = [];
@@ -18,7 +18,10 @@ const onConnect = async (socket, userId) => {
   socket.broadcast.emit('onlineUsers', onlineUsers);
 };
 
-const saveMessage = async (message, nickname, timestamp) => {
+const saveMessage = async (io, message, nickname) => {
+  const timestamp = moment().format('DD-MM-YYYY HH:mm:ss');
+  io.emit('message', `${timestamp} - ${nickname}: ${message}`);
+
   await connect()
       .then((db) => db.collection('messages')
       .insertOne({ message, nickname, timestamp }));
@@ -29,7 +32,6 @@ const changeNick = (io, socket, nickName, newNickName) => {
   onlineUsers.push(newNickName);
   socket.emit('whoAmI', newNickName);
   io.emit('onlineUsers', onlineUsers);
-  // console.log('Enviei para todos os usuários essa nova lista:', onlineUsers);
 };
 
 const disconnect = (socket, userId) => {
