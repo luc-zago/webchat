@@ -1,6 +1,7 @@
 const app = require('express')();
 const http = require('http').createServer(app);
 const cors = require('cors');
+const moment = require('moment');
 const io = require('socket.io')(http, {
   cors: {
     origin: 'http://localhost:3000',
@@ -24,7 +25,9 @@ io.on('connection', (socket) => {
   utils.onConnect(socket, newUserId);
 
   socket.on('message', async ({ chatMessage, nickname }) => {
-    await utils.saveMessage(io, chatMessage, nickname);
+    const timestamp = moment().format('DD-MM-YYYY HH:mm:ss');
+    io.emit('message', `${timestamp} - ${nickname}: ${chatMessage}`);
+    await utils.saveMessage(chatMessage, nickname, timestamp);
   });
 
   socket.on('setNickname', (nickName) => {

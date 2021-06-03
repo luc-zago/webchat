@@ -1,4 +1,4 @@
-const moment = require('moment');
+// const moment = require('moment');
 const connect = require('../models/connection');
 
 let onlineUsers = [];
@@ -18,10 +18,7 @@ const onConnect = async (socket, userId) => {
   socket.broadcast.emit('onlineUsers', onlineUsers);
 };
 
-const saveMessage = async (io, message, nickname) => {
-  const timestamp = moment().format('DD-MM-YYYY HH:mm:ss');
-  io.emit('message', `${timestamp} - ${nickname}: ${message}`);
-
+const saveMessage = async (message, nickname, timestamp) => {
   await connect()
       .then((db) => db.collection('messages')
       .insertOne({ message, nickname, timestamp }));
